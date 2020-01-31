@@ -1596,7 +1596,7 @@ bool match_global_settings(struct fi_info * prov)
      * but as more and more providers supported this feature, the decision was made to
      * require it. */
     CHECK_CAP(MPIDI_OFI_ENABLE_TAGGED,
-              !(prov->caps & FI_TAGGED) || !(prov->caps & FI_DIRECTED_RECV) ||
+              !(prov->caps & FI_TAGGED) || !(prov->rx_attr->caps & FI_DIRECTED_RECV) ||
               prov->domain_attr->cq_data_size < 4);
 
     CHECK_CAP(MPIDI_OFI_ENABLE_AM,
@@ -1708,7 +1708,7 @@ static void update_global_settings(struct fi_info *prov_use, struct fi_info *hin
     }
     UPDATE_SETTING_BY_INFO(enable_tagged,
                            (prov_use->caps & FI_TAGGED) &&
-                           (prov_use->caps & FI_DIRECTED_RECV) &&
+                           (prov_use->rx_attr->caps & FI_DIRECTED_RECV) &&
                            (prov_use->domain_attr->cq_data_size >= 4));
     UPDATE_SETTING_BY_INFO(enable_am,
                            (prov_use->caps & (FI_MSG | FI_MULTI_RECV | FI_READ)) ==
@@ -1791,7 +1791,7 @@ static void init_hints(struct fi_info *hints)
 
     if (MPIDI_OFI_ENABLE_TAGGED) {
         hints->caps |= FI_TAGGED;       /* Tag matching interface  */
-        hints->caps |= FI_DIRECTED_RECV;        /* Match source address    */
+        hints->rx_attr->caps |= FI_DIRECTED_RECV;       /* Match source address    */
         hints->domain_attr->cq_data_size = 4;   /* Minimum size for completion data entry */
     }
 
